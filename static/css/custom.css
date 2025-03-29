@@ -1,0 +1,104 @@
+/* Custom styles for AppSync application */
+
+/* Avatar styling */
+.avatar-circle {
+    width: 100px;
+    height: 100px;
+    background-color: var(--bs-primary);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.initials {
+    font-size: 42px;
+    color: white;
+    font-weight: bold;
+}
+
+/* Card hover effect */
+.card {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Custom button styles */
+.btn {
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 8px;
+    border-left-width: 5px;
+}
+
+/* Table styling */
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+/* Modal styling */
+.modal-header {
+    border-radius: calc(0.5rem - 1px) calc(0.5rem - 1px) 0 0;
+}
+
+/* Custom scrollbar for modern browsers */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #333;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bs-primary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #0069d9;
+}
+
+/* IDOR vulnerability demonstration styling */
+.idor-test-area {
+    background-color: #323232;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.idor-test-area h4 {
+    color: var(--bs-warning);
+}
+
+/* Footer styling */
+footer {
+    margin-top: 50px;
+    padding: 20px 0;
+    background-color: #343a40;
+}
+
+/* Custom animation for loading */
+.loading-spinner {
+    animation: spin 1s infinite linear;
+    display: inline-block;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

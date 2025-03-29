@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}AppSync - Profile{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Your Profile</h3>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="avatar-circle mx-auto mb-3">
+                        <span class="initials">{{ current_user.username[0] | upper }}</span>
+                    </div>
+                    <h2>{{ current_user.username }}</h2>
+                    <p class="text-muted">Member since {{ current_user.created_at.strftime('%B %d, %Y') }}</p>
+                </div>
+
+                <div class="mb-4">
+                    <h4 class="mb-3">Account Information</h4>
+                    <div class="list-group">
+                        <div class="list-group-item">
+                            <div class="row">
+                                <div class="col-md-4 fw-bold">Username:</div>
+                                <div class="col-md-8">{{ current_user.username }}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="row">
+                                <div class="col-md-4 fw-bold">Email:</div>
+                                <div class="col-md-8">{{ current_user.email }}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="row">
+                                <div class="col-md-4 fw-bold">User ID:</div>
+                                <div class="col-md-8">{{ current_user.id }}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="row">
+                                <div class="col-md-4 fw-bold">Account Created:</div>
+                                <div class="col-md-8">{{ current_user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

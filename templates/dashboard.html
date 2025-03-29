@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}AppSync - Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Welcome, {{ current_user.username }}!</h3>
+            </div>
+            <div class="card-body">
+                <p class="lead">This is your personal dashboard. Here you can manage your notes and see what's new.</p>
+                
+                <!-- IDOR Testing Info -->
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-info-circle me-2"></i>IDOR Testing Information</h5>
+                    <p>This application contains intentional IDOR vulnerabilities for testing purposes.</p>
+                    <p>Try accessing other users' notes at: <code>/notes/&lt;user_id&gt;</code> or <code>/api/note/&lt;note_id&gt;</code></p>
+                    <p>View all users at: <code>/api/users</code></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Add New Note</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('add_note') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" id="content" name="content" rows="4" required></textarea>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="private" name="private" checked>
+                        <label class="form-check-label" for="private">Private Note</label>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Save Note</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Your Notes</h5>
+            </div>
+            <div class="card-body">
+                {% if notes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Created</th>
+                                <th>Privacy</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for note in notes %}
+                            <tr>
+                                <td>{{ note.title }}</td>
+                                <td>{{ note.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    {% if note.private %}
+                                    <span class="badge bg-danger">Private</span>
+                                    {% else %}
+                                    <span class="badge bg-success">Public</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-info view-note" data-bs-toggle="modal" data-bs-target="#viewNoteModal" 
+                                            data-note-id="{{ note.id }}" data-note-title="{{ note.title }}" data-note-content="{{ note.content }}">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <a href="{{ url_for('edit_note', note_id=note.id) }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger delete-note" data-bs-toggle="modal" data-bs-target="#deleteNoteModal" 
+                                            data-note-id="{{ note.id }}" data-note-title="{{ note.title }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle fa-2x mb-3"></i>
+                    <p class="mb-0">You don't have any notes yet. Use the form to create your first note!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Note Modal -->
+<div class="modal fade" id="viewNoteModal" tabindex="-1" aria-labelledby="viewNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewNoteModalLabel">Note Title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="noteContent"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Note Modal -->
+<div class="modal fade" id="deleteNoteModal" tabindex="-1" aria-labelledby="deleteNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteNoteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the note: <span id="deleteNoteTitle"></span>?</p>
+                <p class="text-danger"><strong>This action cannot be undone.</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteNoteForm" method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // View note modal
+    const viewNoteButtons = document.querySelectorAll('.view-note');
+    viewNoteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const title = this.getAttribute('data-note-title');
+            const content = this.getAttribute('data-note-content');
+            document.getElementById('viewNoteModalLabel').textContent = title;
+            document.getElementById('noteContent').textContent = content;
+        });
+    });
+    
+    // Delete note modal
+    const deleteNoteButtons = document.querySelectorAll('.delete-note');
+    deleteNoteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const noteId = this.getAttribute('data-note-id');
+            const noteTitle = this.getAttribute('data-note-title');
+            document.getElementById('deleteNoteTitle').textContent = noteTitle;
+            document.getElementById('deleteNoteForm').action = `/delete_note/${noteId}`;
+        });
+    });
+});
+</script>
+{% endblock %}
